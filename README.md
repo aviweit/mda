@@ -73,7 +73,7 @@ ALTER USER postgres PASSWORD 'myPassword';
 ```
 
 #### Kafka
-TBD
+Ensure you have kafka broker already installed. You can use [these instructions](https://github.com/5GZORRO/infrastructure/blob/master/docs/kafka.md) to provision such a one
 
 ### Notes
 
@@ -83,9 +83,11 @@ For the signing step, described earlier, we need a public key. Therefore we need
 
 ```
 $ export OPERATOR_PUBLIC_KEY=<PUBLIC_KEY>
+$ export POSTGRES_URL=<ipaddress>:5432
 $ export POSTGRES_USER=postgres
 $ export POSTGRES_PW=myPassword
-$ export KAFKA_URL=172.15.0.195:9092
+$ export KAFKA_URL=<ipaddress>:9092
+$ export KAFKA_TOPIC=operator-a-topic-in
 ```
 
 
