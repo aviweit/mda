@@ -1,25 +1,26 @@
 {
-  "businessID": randint(100,999),
-  "topic": "operator-a-1-in",
-  "networkID": randint(100,999),
+  "businessID": 1234,
+  "topic": "operator-b-in-1",
+  "networkID": 1234,
   "metrics": [{
       "metricName": "cpu_utilization",
       "metricType": "float",
-      "aggregationMethod": None,
+      "aggregationMethod": "",
       "timestampStep": "30s"
     },
     {
       "metricName": "ram_utilization",
       "metricType": "float",
-      "aggregationMethod": None,
+      "aggregationMethod": "",
       "timestampStep": "1m"
     },
     {
       "metricName": "disk_usage",
       "metricType": "float",
-      "aggregationMethod": None,
+      "aggregationMethod": "",
       "timestampStep": "2m"
     }
   ],
-  "timestampStart": "2021-03-12T11:34:00",
+  "timestampStart": "2021-03-22T00:00:01",
+  "timestampEnd": "2021-03-31T23:59:59"
 }
