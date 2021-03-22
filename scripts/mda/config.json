@@ -1,0 +1,25 @@
+{
+  "businessID": randint(100,999),
+  "topic": "operator-a-1-in",
+  "networkID": randint(100,999),
+  "metrics": [{
+      "metricName": "cpu_utilization",
+      "metricType": "float",
+      "aggregationMethod": None,
+      "timestampStep": "30s"
+    },
+    {
+      "metricName": "ram_utilization",
+      "metricType": "float",
+      "aggregationMethod": None,
+      "timestampStep": "1m"
+    },
+    {
+      "metricName": "disk_usage",
+      "metricType": "float",
+      "aggregationMethod": None,
+      "timestampStep": "2m"
+    }
+  ],
+  "timestampStart": "2021-03-12T11:34:00",
+}
