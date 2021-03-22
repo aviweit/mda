@@ -40,16 +40,56 @@ MDA|`http://<IP>:4000/settings`|Retrieve all the existing monitoring specs|GET
 MDA|`http://<IP>:4000/settings/:id`|Delete a certain existing monitoring specs|DELETE
 
 
-### Deployment Instructions
+## Deployment Instructions
 This section covers all the needs a developer has to get deployment of the development scenario.
 
-#### Prerequisites
-For the signing step, described earlier, we need a public key. Therefore we need to set the operator's public key as an environment variable. Also, due to postgres addition, we need to set the postgres password: 
+### Prerequisites
+
+#### postgress
+A postgress database is required. The below installation command is taken from [here](https://www.postgresql.org/download/linux/ubuntu/)
+
+```
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install postgresql
+```
+
+Next, define password (taken from here [here](https://chartio.com/resources/tutorials/how-to-set-the-default-user-password-in-postgresql/#changing-the-password))
+
+**Note:** update the password below accordingly
+
+login to the host where the database is installed, become `postgres` user and connect the database
+
+```
+sudo -u postgres
+psql
+```
+
+set the password by invoking the below command
+
+```
+ALTER USER postgres PASSWORD 'myPassword';
+```
+
+#### Kafka
+TBD
+
+### Notes
+
+For the signing step, described earlier, we need a public key. Therefore we need to set the operator's public key as an environment variable (see settings step) 
+
+### Settings
+
 ```
 $ export OPERATOR_PUBLIC_KEY=<PUBLIC_KEY>
-$ export POSTGRES_PW=<POSTGRES_PW>
+$ export POSTGRES_USER=postgres
+$ export POSTGRES_PW=myPassword
+$ export KAFKA_URL=172.15.0.195:9092
 ```
-#### Deploy components
+
+
+### Deploy components
 The components configuration is built in a docker-compose. Since we are handling private packages, the first step requires the authentication of the user to get permissions. So, to acquire these permissions the following command is needed:
 ```
 $ docker login -u <GITHUB_USER> -p <GITHUB_PASSWORD_OR_TOKEN>  docker.pkg.github.com
