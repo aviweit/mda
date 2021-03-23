@@ -23,6 +23,7 @@ services:
       - "4000"
     environment:
       KAFKA_URL: ${KAFKA_URL}
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
       OPERATOR_PUBLIC_KEY: ${OPERATOR_PUBLIC_KEY}
       POSTGRES_USER: "postgres"
       POSTGRES_PW: ${POSTGRES_PW}

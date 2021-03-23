@@ -16,16 +16,16 @@ class Config(Base):
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, nullable=True)
     business_id = Column(Integer, nullable=False)
-    kafka_topic = Column(String(250), nullable=False)
+    #kafka_topic = Column(String(250), nullable=False)
     network_id = Column(Integer, nullable=False)
     timestamp_start = Column(DateTime, nullable=False)
     timestamp_end = Column(DateTime, nullable=True)
     status = Column(Integer, default=1)
     metrics = relationship("Metric")
 
-    def __init__(self, business_id, kafka_topic, network_id, timestamp_start, timestamp_end):
+    def __init__(self, business_id, network_id, timestamp_start, timestamp_end):
         self.business_id = business_id
-        self.kafka_topic = kafka_topic
+        #self.kafka_topic = kafka_topic
         self.network_id = network_id
         self.timestamp_start = timestamp_start
         self.timestamp_end = timestamp_end
@@ -35,7 +35,7 @@ class Config(Base):
                  'created_at': self.created_at,
                  'updated_at': self.updated_at,
                  'businessID': self.business_id,
-                 'topic': self.kafka_topic,
+                 #'topic': self.kafka_topic,
                  'networkID': self.network_id,
                  'timestampStart': self.timestamp_start,
                  'timestampEnd': self.timestamp_end,
@@ -68,7 +68,7 @@ class Metric(Base):
 # ----------------------------------------------------------------#
 def add_config(config: Config_Model):
     try:
-        row = Config(config.businessID, config.topic, config.networkID, config.timestampStart, config.timestampEnd)
+        row = Config(config.businessID, config.networkID, config.timestampStart, config.timestampEnd)
         db_session.add(row)
         db_session.commit()
         response = row.toString()

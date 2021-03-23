@@ -13,6 +13,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.dialects.postgresql as postgresql
 
 KAFKA_URL=os.environ["KAFKA_URL"]
+KAFKA_TOPIC=os.environ["KAFKA_TOPIC"]
 POSTGRES_USER = os.environ["POSTGRES_USER"]
 POSTGRES_PW = os.environ["POSTGRES_PW"]
 POSTGRES_URL = os.environ["POSTGRES_URL"]
@@ -27,7 +28,7 @@ class Metric_Model(BaseModel):
 
 class Config_Model(BaseModel):
 	businessID: int
-	topic: str
+	#topic: str
 	networkID: int
 	metrics: List[Metric_Model]
 	timestampStart: Optional[str] = datetime.datetime.now()
@@ -43,7 +44,7 @@ class Response_Config_Model(BaseModel):
 	created_at: datetime.datetime
 	updated_at: datetime.datetime
 	businessID: int
-	topic: str
+	#topic: str
 	networkID: int
 	timestampStart: datetime.datetime
 	timestampEnd: datetime.datetime
@@ -57,8 +58,8 @@ class Response_Error_Model(BaseModel):
 from .database import *
 
 class thread_with_trace(threading.Thread): 
-	def __init__(self, *args, **keywords): 
-		threading.Thread.__init__(self, *args, **keywords) 
+	def __init__(self, *args, **kwargs): 
+		threading.Thread.__init__(self, *args, **kwargs) 
 		self.killed = False
 
 	def start(self): 
@@ -107,7 +108,7 @@ def validate_uuid4(uuid_string):
 		return False
 	return True
 
-def request_OSM(topic, request_metric, request_start):
+def request_OSM(request_metric, request_start, **kwargs):
 	endpoint = 'http://osm:4500/monitoringData?'
 	request_url = endpoint + request_metric + request_start
 	response = requests.get(request_url)
@@ -130,12 +131,14 @@ def request_OSM(topic, request_metric, request_start):
 	producer = KafkaProducer(bootstrap_servers=[KAFKA_URL], value_serializer=lambda x:json.dumps(x).encode('utf-8'), api_version=(0,10,1))
 	print("Post Data into Kafka Topic")
 
-	producer.send(topic, json_data)
+	json_data.update(**kwargs)
+	print ('json_data after update %s' % json_data)
+	producer.send(KAFKA_TOPIC, json_data)
 	return "Post Data into Data Lake sucessfull"
 
 
 # curl 'http://localhost:9090/api/v1/query?query=cpu_utilization&time=2015-07-01T20:10:51.781Z'
-def fetch_values(topic, metric_id, metric_name, starttime , timeout, status, step):
+def fetch_values(metric_id, metric_name, starttime , timeout, status, step, **kwargs):
 	''' 2 situations that can happen
 		1. VS sends with timestamp fields filled (not null):
 			- verify start time
@@ -152,13 +155,13 @@ def fetch_values(topic, metric_id, metric_name, starttime , timeout, status, ste
 	if (timeout != None):
 		while((datetime.datetime.now() >= starttime) and (datetime.datetime.now() < timeout) and status==1):
 			print(f'{datetime.datetime.now()} - S1: Fetching values from OSM, metric: {metric_name}, step: {step}')
-			request_OSM(topic, request_metric, request_start)
+			request_OSM(request_metric, request_start, **kwargs)
 			time.sleep(convert_to_seconds(step))
 	else:
 		while(status == 1):
 			#print('entraste')
 			print(f'{datetime.datetime.now()} - S2: Fetching values from OSM, metric: {metric_name}, step: {step}')
-			request_OSM(request_metric, request_start)
+			request_OSM(request_metric, request_start, **kwargs)
 			time.sleep(convert_to_seconds(step))
 	return f'Done Fetching values of metric: {metric_id} - {metric_name}'
 
@@ -172,9 +175,9 @@ def fetch_values(topic, metric_id, metric_name, starttime , timeout, status, ste
 					time.sleep(convert_to_seconds(metric["timestampStep"]))
 				return f'Done Fetching values of metric: {metric["id"]} - {metric["metricName"]}'''
 
-def transform_config(metric_id, metric_name, topic, timestampStart, timestampEnd, status, step):
+def transform_config(metric_id, metric_name, timestampStart, timestampEnd, status, step, **kwargs):
 	global threads
-	obj = thread_with_trace(target = fetch_values, args=(topic, metric_id, metric_name, timestampStart, timestampEnd, status, step))
+	obj = thread_with_trace(target = fetch_values, args=(metric_id, metric_name, timestampStart, timestampEnd, status, step), kwargs=kwargs)
 	threads[str(metric_id)] = obj
 	threads[str(metric_id)].start()
 	print(f'{datetime.datetime.now()} - Active Threads {threading.active_count()}')
@@ -243,7 +246,8 @@ async def set_param(config: Config_Model):
 
 	# Run threads
 	for metric in resp['metrics']:
-	  transform_config(metric['id'], metric['metricName'], resp['topic'], resp['timestampStart'], resp['timestampEnd'], resp['status'], metric['timestampStep'])
+	  transform_config(metric['id'], metric['metricName'], resp['timestampStart'], resp['timestampEnd'], resp['status'], metric['timestampStep'],
+					userID='operator-a', businessID=resp['businessID'], networkID=resp['networkID'])
 	  del metric['id']
 
 	return resp
@@ -310,7 +314,7 @@ async def update_config_id(config_id, config: Update_Config_Model):
 
 	# Run threads
 	for metric in resp2['metrics']:
-	  transform_config(metric['id'], metric['metricName'], resp['topic'], resp['timestampStart'], resp['timestampEnd'], resp['status'], metric['timestampStep'])
+	  transform_config(metric['id'], metric['metricName'], resp['timestampStart'], resp['timestampEnd'], resp['status'], metric['timestampStep'])
 	  del metric['id']
 
 	return resp2
@@ -335,7 +339,7 @@ async def enable_config_id(config_id):
 
 	# Run threads
 	for metric in resp['metrics']:
-	  transform_config(metric['id'], metric['metricName'], resp['topic'], resp['timestampStart'], resp['timestampEnd'], resp['status'], metric['timestampStep'])
+	  transform_config(metric['id'], metric['metricName'], resp['timestampStart'], resp['timestampEnd'], resp['status'], metric['timestampStep'])
 	  del metric['id']
 
 	return resp
