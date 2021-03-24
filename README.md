@@ -82,6 +82,7 @@ For the signing step, described earlier, we need a public key. Therefore we need
 ### Settings
 
 ```
+$ export USER_ID=operator-a
 $ export OPERATOR_PUBLIC_KEY=<PUBLIC_KEY>
 $ export POSTGRES_URL=<ipaddress>:5432
 $ export POSTGRES_USER=postgres

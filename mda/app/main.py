@@ -12,6 +12,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.dialects.postgresql as postgresql
 
+USER_ID=os.environ["USER_ID"]
 KAFKA_URL=os.environ["KAFKA_URL"]
 KAFKA_TOPIC=os.environ["KAFKA_TOPIC"]
 POSTGRES_USER = os.environ["POSTGRES_USER"]
@@ -247,7 +248,7 @@ async def set_param(config: Config_Model):
 	# Run threads
 	for metric in resp['metrics']:
 	  transform_config(metric['id'], metric['metricName'], resp['timestampStart'], resp['timestampEnd'], resp['status'], metric['timestampStep'],
-					userID='operator-a', businessID=resp['businessID'], networkID=resp['networkID'])
+					userID=USER_ID, businessID=resp['businessID'], networkID=resp['networkID'])
 	  del metric['id']
 
 	return resp

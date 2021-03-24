@@ -22,6 +22,7 @@ services:
     expose:
       - "4000"
     environment:
+      USER_ID: ${USER_ID}
       KAFKA_URL: ${KAFKA_URL}
       KAFKA_TOPIC: ${KAFKA_TOPIC}
       OPERATOR_PUBLIC_KEY: ${OPERATOR_PUBLIC_KEY}

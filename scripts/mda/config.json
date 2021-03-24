@@ -1,6 +1,6 @@
 {
   "businessID": 1234,
-  "networkID": 1234,
+  "networkID": 6789,
   "metrics": [{
       "metricName": "cpu_utilization",
       "metricType": "float",
