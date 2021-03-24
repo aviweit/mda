@@ -1,6 +1,5 @@
 {
   "businessID": 1234,
-  "topic": "operator-b-in-1",
   "networkID": 1234,
   "metrics": [{
       "metricName": "cpu_utilization",
