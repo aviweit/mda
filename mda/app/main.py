@@ -28,9 +28,9 @@ class Metric_Model(BaseModel):
 	timestampStep: str
 
 class Config_Model(BaseModel):
-	businessID: int
+	businessID: str
 	#topic: str
-	networkID: int
+	networkID: str
 	metrics: List[Metric_Model]
 	timestampStart: Optional[str] = datetime.datetime.now()
 	timestampEnd: Optional[str] = None
@@ -44,9 +44,9 @@ class Response_Config_Model(BaseModel):
 	id: uuid.UUID
 	created_at: datetime.datetime
 	updated_at: datetime.datetime
-	businessID: int
+	businessID: str
 	#topic: str
-	networkID: int
+	networkID: str
 	timestampStart: datetime.datetime
 	timestampEnd: datetime.datetime
 	metrics: List[Metric_Model]
